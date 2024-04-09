@@ -2,7 +2,7 @@ os
 subprocess
 urllib.error
 time
-webbrowser
+webbrowser==2.10
 pyttsx3
 mediawiki
 wolframalpha
