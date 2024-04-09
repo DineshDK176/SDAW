@@ -1,0 +1,7 @@
+webbrowser
+pyttsx3
+mediawiki
+wolframalpha
+speechrecognition
+pillow
+itertools
