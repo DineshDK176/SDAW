@@ -11,3 +11,4 @@ pillow
 itertools
 threading
 datetime
+tkinter
