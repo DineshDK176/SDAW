@@ -9,3 +9,5 @@ wolframalpha
 speechrecognition
 pillow
 itertools
+threading
+datetime
