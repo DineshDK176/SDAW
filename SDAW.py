@@ -11,8 +11,7 @@ class GifLabel(Label):
 
     text = ''
     f_back,con  = 0,0
-
-    #To Load the GIF image as a Label
+    
     def __init__(self, master=None,**kwargs):
         super().__init__(master, **kwargs)
         self.frames = []
@@ -75,9 +74,7 @@ class GifLabel(Label):
             self.engine.say(txt)
             self.engine.runAndWait()
         label.destroy()
-        if self.f_back == 0:
-            self.r_voice()
-            self.f_back=0
+        
         if con == 1:
             root.destroy()
             exit()
@@ -97,23 +94,6 @@ class GifLabel(Label):
                     c=0
         speech = td.Thread(target = self.speak,args = (text,con))
         speech.start()
-
-    def r_voice(self):
-        self.f_back=2
-        if self.con != 1:
-            mic = sr.Recognizer()
-            with sr.Microphone() as source:
-                self.Thread_speak("Wating for the Command...")
-                mic.pause_threshold = 0.8
-                audio = mic.listen(source)
-            try:
-                self.Thread_speak("Wait...")
-                query = self.mic.recognize_google(audio, language='en-in')
-                self.Thread_speak(f"User Side: {query}\n")
-                return query
-            except Exception as e:
-                self.Thread_speak("Say again, please...")
-                return ""
 
     def Run(self,*action,txt_fld=None):
         
@@ -223,12 +203,7 @@ class GifLabel(Label):
 
     def get_txt(self,txt_fld=None):
         self.text = txt_fld.get('1.0','end').lower()
-        if self.f_back == 1:
-            self.pros(self.text,txt_fld=txt_fld)
-
-        else :
-            self.text = self.r_voice().lower()
-            self.pros(self.text)
+        self.pros(self.text,txt_fld=txt_fld)
 
     def welcome(self):
         time = int(dt.datetime.now().hour)
@@ -240,42 +215,22 @@ class GifLabel(Label):
             wish = "Good Evening"
         self.Thread_speak(wish,"I am Michella","How can I help you")
         
-    def key(self,keyboard=None,Mic=None,txt_fld=None,submit=None):
-        keyboard.pack_forget()
-        self.f_back = 1
-        Mic.pack()
-        txt_fld.pack()
-        submit.pack()
-
-    def mic(self,keyboard=None,Mic=None,txt_fld=None,submit=None):
-        Mic.pack_forget()
-        txt_fld.pack_forget()
-        submit.pack_forget()
-        keyboard.pack()
-        self.f_back = 0
         
     def window(self,master=None):
 
-        #Destination of the Mic Image
         mic_ico = PhotoImage(file = "D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\Mic.png")
 
-        #Destination of the Keyboard Image
         key_ico = PhotoImage(file = "D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\Keyboard.png")
 
         txt_fld = Text(master,width=50,height=1,bg='white',fg='black')
 
         submit = Button(master,text='Submit',width=10,command=lambda :self.get_txt(txt_fld=txt_fld))
 
-        keyboard = Button(master,image = key_ico,command=lambda:self.key(keyboard=keyboard,Mic=Mic,txt_fld=txt_fld,submit=submit))
-
-        Mic = Button(master,image = mic_ico,command=lambda:self.mic(keyboard=keyboard,Mic=Mic,txt_fld=txt_fld,submit=submit))
-
-        keyboard.pack()
+        txt_fld.pack()
+        
+        submit.pack()
         
         self.welcome()
-
-        self.r_voice()
-        
         
 if __name__ == '__main__':
     try:
@@ -291,7 +246,6 @@ if __name__ == '__main__':
     root.config(bg='black')
 
     lb = GifLabel(root)
-    #Destination of the GIF image
     lb.image_load('D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\AI Interface.gif')
     lb.pack()
 
