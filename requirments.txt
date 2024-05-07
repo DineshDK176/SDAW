@@ -1,6 +1,6 @@
-pywhatkit==5.4
-pyttsx3==2.90
-pymediawiki==1.2
-wolframalpha==5.0.0
-speechrecognition==3.10.1
-pillow==10.1.0
+pywhatkit
+pyttsx3
+pymediawiki
+wolframalpha
+speechrecognition
+pillow
