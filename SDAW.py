@@ -1,4 +1,5 @@
 import os,webbrowser,pyttsx3,mediawiki,subprocess,urllib.error,time
+import requests
 import wolframalpha as wa
 import threading as td
 import datetime as dt
@@ -8,9 +9,8 @@ from PIL import Image, ImageTk
 from itertools import count
 
 class GifLabel(Label):
-
-    text = ''
-    f_back,con  = 0,0
+    text = '' # A Text for Speech Function.
+    f_back,con,length  = 0,0,0 # Feedback from Function call & Condition variable
     
     def __init__(self, master=None,**kwargs):
         super().__init__(master, **kwargs)
@@ -19,7 +19,7 @@ class GifLabel(Label):
         self.delay = 100
         
         
-    def image_load(self, gif_pic):
+    def image_load(self, gif_pic): # To Load the Image
         if isinstance(gif_pic, str):
             gif_pic = Image.open(gif_pic)
             self.frames = []
@@ -42,7 +42,7 @@ class GifLabel(Label):
         else:
             self.next_frame()
 
-    def next_frame(self):
+    def next_frame(self): # To loop the Image frame
         if self.frames:
             self.loc += 1
             self.loc %= len(self.frames)
@@ -53,25 +53,31 @@ class GifLabel(Label):
     engine.setProperty('voice', 'en-in')
     engine.setProperty('rate', engine.getProperty('rate') - 40)
     
-    def speak(self, query,con=None):
+    def speak(self, query,con=None): # Text to Speech Function
         label = Label(root,bg='black')
-        txt = ''
-        for i in query:
-            try:
-                txt += i + ' .\n'
-            except TypeError:
-                pass
-        label.config(text=f"AI: {txt}",fg="white")
+        t = ''
+        if con != 0:
+            for i in query:
+                try:
+                    t += i + ' .\n'
+                except TypeError:
+                    pass
+        elif con == 0:
+            for i in list(query):
+                try:
+                    t += i
+                except TypeError:
+                    pass
+        label.config(text=f"AI: {t}",fg="white")
         label.pack()
         
         try:
-                
-            self.engine.say(txt)
+            self.engine.say(t)
             self.engine.runAndWait()
             
         except RuntimeError:
             time.sleep(5)
-            self.engine.say(txt)
+            self.engine.say(t)
             self.engine.runAndWait()
         label.destroy()
         
@@ -79,29 +85,31 @@ class GifLabel(Label):
             root.destroy()
             exit()
         
-    def Thread_speak(self,*text,res=None,con=None):
+    def Thread_speak(self,*txt,res=None,con=None):
         self.con = con
-        text = list(text)
+        txt = list(txt)
         if res != None:
+            txt = str(txt)
             res.split()
             c = 0
             for i in res:
-                text[2] += i
-                text[2] += ' '
+                txt += i
+                # txt += ' '
                 c += 1
                 if c == 100:
-                    text[2] += '\n'
+                    txt += '\n'
                     c=0
-        speech = td.Thread(target = self.speak,args = (text,con))
+                    con = 0
+        speech = td.Thread(target = self.speak,args = (txt,con))
         speech.start()
 
-    def Run(self,*action,txt_fld=None):
+    def Run(self,*action,txt_fld=None): # To Run Multiple Tasks
         
         self.Thread_speak(f'Openning {action[0]}...')
         os.startfile(f'{action[1]}')
         txt_fld.delete('1.0','end')
 
-    def pros(self, query,txt_fld=None):
+    def pros(self, query,txt_fld=None): # To pass the Process to system
         query = query.replace(' ','')
 
         if ('goodbye' in query)  or ('bye' in query):
@@ -160,14 +168,17 @@ class GifLabel(Label):
             query = query.replace("wikipedia","")
             txt_fld.delete('1.0','end')
             try:
-                self.Thread_speak("searching in wikipedia","According to wikipedia",'',res=mk.summary(query,sentences=3))
+                self.Thread_speak("According to wikipedia",res=mk.summary(query,sentences=2),con = 2)
                 
             except mediawiki.DisambiguationError as e:
 
                 self.Thread_speak("Sorry the Information you looking is couldn't find...!")
                 self.Thread_speak("Give Clear Content..")
-            except Exception:
-                self.Thread_speak("Please Check Your Internet and Try again")
+            except requests.exceptions.ConnectionError as e:
+                self.Thread_speak(str(e))
+
+            except Exception as e:
+                self.Thread_speak(str(e))
 
         elif ("play" in query):
             
@@ -187,7 +198,7 @@ class GifLabel(Label):
 
         else:
             try:
-                clt = wa.Client('GPGV2J-KG8TVJT6YT')
+                clt = wa.Client('GPGV2J-HU83EK4K43')
                 res = clt.query(self.text)
                 txt_fld.delete('1.0','end')
                 ans=''
@@ -201,11 +212,11 @@ class GifLabel(Label):
                 txt_fld.delete('1.0','end')
                 self.Thread_speak("Please Check Your Internet and Try again")
 
-    def get_txt(self,txt_fld=None):
+    def get_txt(self,txt_fld=None): # Getting text from Text Field
         self.text = txt_fld.get('1.0','end').lower()
         self.pros(self.text,txt_fld=txt_fld)
 
-    def welcome(self):
+    def welcome(self): # Welcome Wish
         time = int(dt.datetime.now().hour)
         if time >= 1 and time < 12:
             wish = "Good Morning"
@@ -213,14 +224,14 @@ class GifLabel(Label):
             wish = "Good Afternoon"
         else:
             wish = "Good Evening"
-        self.Thread_speak(wish,"I am Michella","How can I help you")
+        self.Thread_speak(wish,"I am Michael","How can I help you")
         
         
-    def window(self,master=None):
+    def window(self,master=None): # Send the Address of the Required Files to PhotoImage function
 
-        mic_ico = PhotoImage(file = "D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\Mic.png")
+        mic_ico = PhotoImage(file = "D:\\Codes\\Pyton\\SDAW\\Mic.png")
 
-        key_ico = PhotoImage(file = "D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\Keyboard.png")
+        key_ico = PhotoImage(file = "D:\\Codes\\Pyton\\SDAW\\Keyboard.png")
 
         txt_fld = Text(master,width=50,height=1,bg='white',fg='black')
 
@@ -232,7 +243,7 @@ class GifLabel(Label):
         
         self.welcome()
         
-if __name__ == '__main__':
+if __name__ == '__main__': # Main Function
     try:
         import pywhatkit as yt
     except Exception as e:
@@ -246,7 +257,7 @@ if __name__ == '__main__':
     root.config(bg='black')
 
     lb = GifLabel(root)
-    lb.image_load('D:\\All Properties\\Python\\Projects\\SDAW\\Addeds\\AI Interface.gif')
+    lb.image_load('D:\\Codes\\Pyton\\SDAW\\AI Interface.gif')
     lb.pack()
 
     w_thread = td.Thread(target = lambda:lb.window(master=root))
