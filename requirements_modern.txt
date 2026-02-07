@@ -1,0 +1,10 @@
+customtkinter
+Pillow
+pyttsx3
+SpeechRecognition
+pyaudio
+pymediawiki
+wolframalpha
+pywhatkit
+requests
+pyinstaller
